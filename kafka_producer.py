@@ -5,7 +5,7 @@ import time
 
 # Configurer le producteur Kafka
 producer = KafkaProducer(
-    bootstrap_servers='localhost:9093',
+    bootstrap_servers='localhost:9092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 

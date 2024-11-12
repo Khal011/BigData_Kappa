@@ -21,13 +21,14 @@ services:
       - zookeeper
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9093  # External and internal listeners
-      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT  # Ensure correct security protocol
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093  # Listen on all interfaces
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT  # Define listener protocol
-      KAFKA_LISTENER_NAME_PLAINTEXT: PLAINTEXT  # Ensure listener name matches
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
     ports:
-      - "9093:9093"  # Exposing the Kafka port for external access
+      - "9092:9092"  # External port for clients outside Docker
+      - "29092:29092"  # Internal port for Docker network
     networks:
       - bigdata-network
 
@@ -80,6 +81,7 @@ services:
 
 networks:
   bigdata-network:
+    name: bigdata-network
     driver: bridge
 
 volumes:
