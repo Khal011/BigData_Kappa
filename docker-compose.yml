@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+
+  # Zookeeper Service
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - bigdata-network
+
+  # Kafka Service
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9093  # External and internal listeners
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT  # Ensure correct security protocol
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093  # Listen on all interfaces
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT  # Define listener protocol
+      KAFKA_LISTENER_NAME_PLAINTEXT: PLAINTEXT  # Ensure listener name matches
+    ports:
+      - "9093:9093"  # Exposing the Kafka port for external access
+    networks:
+      - bigdata-network
+
+  # Spark Service
+  spark:
+    image: bitnami/spark:latest
+    container_name: spark
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark
+      - SPARK_MASTER_PORT=7077
+    ports:
+      - "8080:8080"  # Spark Web UI
+      - "7077:7077"  # Spark Master Port
+    networks:
+      - bigdata-network
+
+  # Cassandra Service
+  cassandra:
+    image: cassandra:3.11
+    container_name: cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=bigdata_cluster
+      - CASSANDRA_LISTEN_ADDRESS=cassandra
+      - CASSANDRA_RPC_ADDRESS=0.0.0.0
+    ports:
+      - "9042:9042"  # Cassandra Query Language (CQL) port
+    networks:
+      - bigdata-network
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "SHOW TABLES"]
+      interval: 10s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+
+
+  # Grafana Service
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"  # Grafana Web UI
+    networks:
+      - bigdata-network
+
+networks:
+  bigdata-network:
+    driver: bridge
+
+volumes:
+  cassandra-data:
+    driver: local
