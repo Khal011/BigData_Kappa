@@ -5,10 +5,12 @@ import json
 consumer = KafkaConsumer(
     'sales_topic',  # Le nom du topic auquel vous souhaitez vous abonner
     bootstrap_servers='localhost:9092',  # Use the correct Kafka broker address
-    group_id='sales_group',  # L'ID du groupe de consommateurs
+    max_poll_records = 100,
     auto_offset_reset='earliest',  # Start reading from the beginning if no offset exists
     value_deserializer=lambda m: json.loads(m.decode('utf-8'))
 )
+
+
 
 # Consommer les messages
 for message in consumer:

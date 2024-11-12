@@ -6,7 +6,8 @@ import time
 # Configurer le producteur Kafka
 producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+    acks='all'
 )
 
 # Charger les données à partir du fichier Excel
