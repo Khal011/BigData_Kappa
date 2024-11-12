@@ -1,0 +1,10 @@
+FROM bitnami/spark:latest
+
+# # Install the Kafka package needed for Spark Streaming
+# RUN /opt/bitnami/spark/bin/spark-shell --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1 
+
+
+# # Copy the Python script into the container
+# COPY ./spark_stremaing.py /opt/
+
+

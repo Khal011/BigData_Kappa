@@ -34,7 +34,9 @@ services:
 
   # Spark Service
   spark:
-    image: bitnami/spark:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.spark  
     container_name: spark
     environment:
       - SPARK_MODE=master
